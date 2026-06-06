@@ -2,7 +2,6 @@
 
 namespace Ponymator\Parser\Tests\Unit\Internal;
 
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ponymator\Parser\Internal\TokenParser;
 use Ponymator\Parser\Internal\TypedDeclaration;
@@ -26,7 +25,9 @@ final class TypedDeclarationTest extends TestCase
         ];
     }
 
-    #[DataProvider('validDeclarations')]
+    /**
+     * @dataProvider validDeclarations
+     */
     public function testParsesValidDeclarations(
         string $input,
         string $expectedName,

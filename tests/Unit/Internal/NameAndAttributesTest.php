@@ -2,7 +2,6 @@
 
 namespace Ponymator\Parser\Tests\Unit\Internal;
 
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ponymator\Parser\Internal\NameAndAttributes;
 use Ponymator\Parser\Internal\TokenParser;
@@ -27,7 +26,9 @@ final class NameAndAttributesTest extends TestCase
         ];
     }
 
-    #[DataProvider('nameAndKeywordCases')]
+    /**
+     * @dataProvider nameAndKeywordCases
+     */
     public function testSplitsNameAndAttributes(string $input, string $expectedName, array $expectedAttributes): void
     {
         $result = TokenParser::splitNameAndAttributes($input);

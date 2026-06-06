@@ -13,7 +13,7 @@ final class FileLoaderTest extends TestCase
     protected function setUp(): void
     {
         $this->tempDir = sys_get_temp_dir() . '/ponymator-loader-test-' . uniqid();
-        mkdir($this->tempDir, 0o777, true);
+        mkdir($this->tempDir, 0777, true);
     }
 
     protected function tearDown(): void

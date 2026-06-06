@@ -1,6 +1,7 @@
 {
     "name": "sinefineinfinitum/parser-ps",
     "description": "Documentation parser for PS v1.0 syntax",
+    "license": "MIT",
     "require": {
         "php": "^8.0"
     },

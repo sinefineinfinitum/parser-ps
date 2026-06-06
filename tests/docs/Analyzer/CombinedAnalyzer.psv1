@@ -1,0 +1,18 @@
+@class final SineFine\Ponymator\Analyzer\CombinedAnalyzer
+.+analyze
+    $ast:array
+    :\SineFine\Ponymator\Analyzer\CombinedAnalysisResult
+    ^SineFine\Ponymator\Analyzer\Extractor\AstHelper
+    ^SineFine\Ponymator\Analyzer\Visitor\EntityExtractingVisitor
+    ^SineFine\Ponymator\Analyzer\Extractor\ClassExtractor
+    ^SineFine\Ponymator\Analyzer\Extractor\InterfaceExtractor
+    ^SineFine\Ponymator\Analyzer\Extractor\TraitExtractor
+    ^SineFine\Ponymator\Analyzer\Extractor\EnumExtractor
+    ^SineFine\Ponymator\Analyzer\Visitor\DependencyCollectingVisitor
+    ^SineFine\Ponymator\Analyzer\Visitor\ObjectCreationCollectingVisitor
+    ^PhpParser\NodeTraverser
+    ^PhpParser\NodeVisitor\NameResolver
+    ^SineFine\Ponymator\Analyzer\CombinedAnalysisResult
+.-findNamespace
+    $ast:array
+    :string|null

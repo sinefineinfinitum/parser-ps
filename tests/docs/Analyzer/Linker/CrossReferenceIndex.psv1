@@ -1,0 +1,15 @@
+@class final SineFine\Ponymator\Analyzer\Linker\CrossReferenceIndex
+$-frozen:bool=false
+$-projectFqns:array=[]
+$-references:array=[]
+.+addReference
+    $referencedFqn:string
+    $referencingFqn:string
+    :void
+    ^RuntimeException
+.+freeze
+    $projectFqns:array=[]
+    :void
+.+getUsedBy
+    $fqn:string
+    :array

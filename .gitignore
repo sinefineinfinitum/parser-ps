@@ -1,0 +1,13 @@
+vendor/
+specs
+.opencode
+.specify
+.github/agents
+.github/prompts
+.idea
+.phpunit.cache
+*.log
+*.phar
+*.cache
+.env*
+.DS_Store

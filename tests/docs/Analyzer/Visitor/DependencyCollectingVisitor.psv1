@@ -1,0 +1,14 @@
+@class final SineFine\Ponymator\Analyzer\Visitor\DependencyCollectingVisitor
+>PhpParser\NodeVisitorAbstract
+!-BUILTIN_TYPES=[]
+$-deps:array=[]
+.-addDep
+    $fqn:string
+    :void
+.+dependencies
+    :array
+.+enterNode
+    $node:\PhpParser\Node
+.-processTypeNode
+    $typeNode:\PhpParser\Node
+    :void

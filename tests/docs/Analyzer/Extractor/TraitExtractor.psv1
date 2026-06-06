@@ -1,0 +1,13 @@
+@class final SineFine\Ponymator\Analyzer\Extractor\TraitExtractor
+<SineFine\Ponymator\Analyzer\Extractor\EntityExtractorInterface
+$-astHelper:\SineFine\Ponymator\Analyzer\Extractor\AstHelper
+$-namespace:string
+.+__construct
+    $namespace:string
+    $astHelper:\SineFine\Ponymator\Analyzer\Extractor\AstHelper
+.+extract
+    $node:\PhpParser\Node
+    :array
+.+supports
+    $node:\PhpParser\Node
+    :bool

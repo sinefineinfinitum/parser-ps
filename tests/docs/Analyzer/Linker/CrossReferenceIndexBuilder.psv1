@@ -1,0 +1,15 @@
+@class final SineFine\Ponymator\Analyzer\Linker\CrossReferenceIndexBuilder
+$-parser:\SineFine\Ponymator\Analyzer\Parser
+$-pathResolver:\SineFine\Ponymator\Filesystem\PathResolver
+.+__construct
+    $parser:\SineFine\Ponymator\Analyzer\Parser
+    $pathResolver:\SineFine\Ponymator\Filesystem\PathResolver
+.+build
+    $sourceFiles:array
+    $result:\SineFine\Ponymator\Documentation\Processor\GenerationResult|null=null
+    :\SineFine\Ponymator\Analyzer\Linker\CrossReferenceContext
+    ^SineFine\Ponymator\Analyzer\Linker\CrossReferenceIndex
+    ^PhpParser\NodeTraverser
+    ^SineFine\Ponymator\Analyzer\Visitor\CrossReferenceScannerVisitor
+    ^SineFine\Ponymator\Documentation\Processor\ErrorDiagnostic
+    ^SineFine\Ponymator\Analyzer\Linker\CrossReferenceContext

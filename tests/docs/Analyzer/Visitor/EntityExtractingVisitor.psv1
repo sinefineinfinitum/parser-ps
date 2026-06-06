@@ -1,0 +1,10 @@
+@class SineFine\Ponymator\Analyzer\Visitor\EntityExtractingVisitor
+>PhpParser\NodeVisitorAbstract
+$-entities:array=[]
+$-extractors:array
+.+__construct
+    $extractors:array
+.+enterNode
+    $node:\PhpParser\Node
+.+entities
+    :array

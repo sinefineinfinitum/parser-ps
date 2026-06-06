@@ -1,0 +1,10 @@
+@class final SineFine\Ponymator\Analyzer\Linker\CrossReferenceContext
+$-fqnToDocPath:array
+$-index:\SineFine\Ponymator\Analyzer\Linker\CrossReferenceIndex
+.+__construct
+    $index:\SineFine\Ponymator\Analyzer\Linker\CrossReferenceIndex
+    $fqnToDocPath:array
+.+getFqnToDocPath
+    :array
+.+getIndex
+    :\SineFine\Ponymator\Analyzer\Linker\CrossReferenceIndex

@@ -1,0 +1,26 @@
+@class final SineFine\Ponymator\Analyzer\Extractor\AstHelper
+.+extractConstants
+    $node:\PhpParser\Node\Stmt\ClassLike
+    :array
+.+extractMethods
+    $node:\PhpParser\Node\Stmt\ClassLike
+    :array
+.+extractProperties
+    $node:\PhpParser\Node\Stmt\ClassLike
+    :array
+.+resolveDefault
+    $default:\PhpParser\Node\Expr
+    :string
+.+resolveFqn
+    $namespace:string
+    $name:string
+    :string
+.-resolveParamVisibility
+    $param:\PhpParser\Node\Param
+    :string
+.+resolveType
+    $typeNode:\PhpParser\Node
+    :string
+.-resolveVisibility
+    $node:\PhpParser\Node\Stmt\ClassConst|\PhpParser\Node\Stmt\ClassMethod|\PhpParser\Node\Stmt\Property
+    :string

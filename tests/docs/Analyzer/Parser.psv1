@@ -1,0 +1,10 @@
+@class SineFine\Ponymator\Analyzer\Parser
+$-parser:\PhpParser\Parser
+.+__construct
+    ^PhpParser\ParserFactory
+.+parseFile
+    $filePath:string
+    :array
+    ^SineFine\Ponymator\Analyzer\ParserException
+    ^PhpParser\NodeTraverser
+    ^PhpParser\NodeVisitor\NameResolver

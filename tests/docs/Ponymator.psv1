@@ -1,0 +1,48 @@
+@class SineFine\Ponymator\Ponymator
+.-createRenderers
+    $output:string
+    :array
+    ^SineFine\Ponymator\Documentation\Renderer\PSV1\Psv1Builder
+    ^SineFine\Ponymator\Documentation\Renderer\PSV1\ClassRenderer
+    ^SineFine\Ponymator\Documentation\Renderer\PSV1\InterfaceRenderer
+    ^SineFine\Ponymator\Documentation\Renderer\PSV1\TraitRenderer
+    ^SineFine\Ponymator\Documentation\Renderer\PSV1\EnumRenderer
+    ^SineFine\Ponymator\Documentation\Renderer\PSV1\FileRenderer
+    ^SineFine\Ponymator\Documentation\Renderer\Markdown\MarkdownBuilder
+    ^SineFine\Ponymator\Documentation\Renderer\Markdown\ClassRenderer
+    ^SineFine\Ponymator\Documentation\Renderer\Markdown\InterfaceRenderer
+    ^SineFine\Ponymator\Documentation\Renderer\Markdown\TraitRenderer
+    ^SineFine\Ponymator\Documentation\Renderer\Markdown\EnumRenderer
+    ^SineFine\Ponymator\Documentation\Renderer\Markdown\FileRenderer
+.-docExtension
+    $output:string
+    :string
+.-renderErrors
+    $report:\SineFine\Ponymator\Documentation\Processor\ErrorReport
+    :void
+    ^SineFine\Ponymator\Cli\Error\ErrorOutputFormatter
+.-reportSummary
+    $result:\SineFine\Ponymator\Documentation\Processor\GenerationResult
+    :void
+.+run
+    :void
+    ^SineFine\Ponymator\Config
+    ^SineFine\Ponymator\Analyzer\Parser
+    ^SineFine\Ponymator\Analyzer\CombinedAnalyzer
+    ^SineFine\Ponymator\Analyzer\FileExtractor
+    ^SineFine\Ponymator\Comparator\HashComparator
+    ^SineFine\Ponymator\Filesystem\PathResolver
+    ^SineFine\Ponymator\Documentation\Linker\CrossReferenceFactory
+    ^SineFine\Ponymator\Documentation\Processor\PageGenerator
+    ^SineFine\Ponymator\Documentation\Cleaner\OutdatedDocumentationRemover
+    ^SineFine\Ponymator\Analyzer\Linker\CrossReferenceIndexBuilder
+    ^SineFine\Ponymator\Documentation\Processor\DocumentationProcessor
+    ^SineFine\Ponymator\Filesystem\Scanner
+.-runDiff
+    $generator:\SineFine\Ponymator\Documentation\Processor\DocumentationProcessor
+    $sourceFiles:array
+    :void
+.-runFull
+    $generator:\SineFine\Ponymator\Documentation\Processor\DocumentationProcessor
+    $sourceFiles:array
+    :void

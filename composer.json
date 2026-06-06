@@ -1,0 +1,17 @@
+{
+    "name": "sinefineinfinitum/parser-ps",
+    "description": "Documentation parser for PS v1.0 syntax",
+    "require": {
+        "php": "^8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10",
+        "phpstan/phpstan": "^2.2",
+        "squizlabs/php_codesniffer": "^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ponymator\\Parser\\": "src/"
+        }
+    }
+}

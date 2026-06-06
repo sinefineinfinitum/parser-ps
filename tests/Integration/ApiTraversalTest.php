@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Ponymator\Tests\Integration;
+namespace Ponymator\Parser\Tests\Integration;
 
 use PHPUnit\Framework\TestCase;
 use Ponymator\Parser\Parser;

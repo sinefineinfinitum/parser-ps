@@ -28,12 +28,19 @@ jobs:
           path: |
             ~/.composer/cache
             vendor
-          key: composer-${{ runner.os }}-php${{ matrix.php }}-${{ hashFiles('composer.lock') }}
+          key: composer-${{ runner.os }}-php${{ matrix.php }}-${{ matrix.php == '8.0' && hashFiles('composer-php80.lock') || hashFiles('composer.lock') }}
           restore-keys: |
             composer-${{ runner.os }}-php${{ matrix.php }}-
 
       - name: Install dependencies
+        if: matrix.php != '8.0'
         run: composer install --no-interaction --prefer-dist
+
+      - name: Install dependencies for PHP 8.0
+        if: matrix.php == '8.0'
+        env:
+          COMPOSER: composer-php80.json
+        run: composer update --no-interaction --no-progress --prefer-dist
 
       - name: PHPUnit
         run: vendor/bin/phpunit -c phpunit.xml.dist
@@ -62,12 +69,19 @@ jobs:
           path: |
             ~/.composer/cache
             vendor
-          key: composer-${{ runner.os }}-php${{ matrix.php }}-${{ hashFiles('composer.lock') }}
+          key: composer-${{ runner.os }}-php${{ matrix.php }}-${{ matrix.php == '8.0' && hashFiles('composer-php80.lock') || hashFiles('composer.lock') }}
           restore-keys: |
             composer-${{ runner.os }}-php${{ matrix.php }}-
 
       - name: Install dependencies
+        if: matrix.php != '8.0'
         run: composer install --no-interaction --prefer-dist
+
+      - name: Install dependencies for PHP 8.0
+        if: matrix.php == '8.0'
+        env:
+          COMPOSER: composer-php80.json
+        run: composer update --no-interaction --no-progress --prefer-dist
 
       - name: PHPStan
         run: vendor/bin/phpstan analyse --memory-limit 1G --no-progress --error-format=checkstyle | cs2pr

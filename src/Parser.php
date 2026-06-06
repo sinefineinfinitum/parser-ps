@@ -81,27 +81,30 @@ class Parser implements ParserInterface
         $trimmed = $line->trimmed;
 
         if (str_starts_with($trimmed, EntityNode::ENTITY_START)) {
-            $state->currentEntity = $this->parseEntityDirective($line);
-            $document->entities[] = $state->currentEntity;
-            $state->currentMethod = null;
+            $entity = $this->parseEntityDirective($line);
+            $document->entities[] = $entity;
+            $state->openEntity($entity);
             return;
         }
 
         if (EntityNode::isRelationMarker($trimmed[0])) {
-            $this->parseEntityRelationDirective($line, $state->currentEntity);
+            $this->parseEntityRelationDirective($line, $state->entity());
             return;
         }
 
-        if ($state->currentEntity === null) {
+        if ($state->entity() === null) {
             throw $this->syntaxError('Member declaration found without active entity', $line);
         }
 
-        $member = $this->parseMemberDirective($line, $state->currentEntity);
-        $state->currentEntity->members[] = $member;
+        $entity = $state->entity();
+        $member = $this->parseMemberDirective($line, $entity);
+        $entity->members[] = $member;
 
-        $state->currentMethod = ($member->type === 'method' || $member->type === 'function')
-            ? $member
-            : null;
+        if ($member->type === 'method' || $member->type === 'function') {
+            $state->openMethod($member);
+        } else {
+            $state->closeMethod();
+        }
     }
 
     /**
@@ -111,11 +114,11 @@ class Parser implements ParserInterface
      */
     private function parseIndentedLine(Line $line, ParserState $state): void
     {
-        if ($state->currentMethod === null) {
+        if ($state->method() === null) {
             throw $this->syntaxError('Indented line found without active method/function block', $line);
         }
 
-        $this->parseMethodChildDirective($line, $state->currentMethod);
+        $this->parseMethodChildDirective($line, $state->method());
     }
 
     /**

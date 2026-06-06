@@ -191,29 +191,24 @@ class Parser implements ParserInterface
             throw $this->syntaxError("Enum case '~' not allowed in @file context", $line);
         }
 
-        $symbol = $firstChar;
-        $visibility = null;
-        $rest = substr($trimmed, 1);
-
-        $hasVisibility = ($rest !== '' && MemberNode::hasVisibility($rest[0]));
-        if ($hasVisibility) {
-            if (!$currentEntity->canHaveVisibility()) {
-                throw $this->syntaxError('Visibility modifiers not allowed in @file context', $line);
-            }
-
-            $visibility = MemberNode::resolveVisibility($rest[0]);
-            $rest = substr($rest, 1);
+        $vis = MemberNode::parseVisibilityPrefix(substr($trimmed, 1));
+        if ($vis['visibility'] !== null && !$currentEntity->canHaveVisibility()) {
+            throw $this->syntaxError('Visibility modifiers not allowed in @file context', $line);
         }
 
-        $declaration = TokenParser::parseTypedDeclaration($rest);
+        $declaration = TokenParser::parseTypedDeclaration($vis['body']);
         $parsed = TokenParser::splitNameAndAttributes($declaration->nameAndKeywords);
 
         if ($parsed->name === '') {
             throw $this->syntaxError('Member name cannot be empty', $line);
         }
 
-        $member = new MemberNode($parsed->name, MemberNode::resolveType($symbol, $currentEntity), $currentEntity);
-        $member->visibility = $visibility;
+        $member = new MemberNode(
+            $parsed->name,
+            MemberNode::resolveType($firstChar, $currentEntity),
+            $currentEntity,
+        );
+        $member->visibility = $vis['visibility'];
         $member->attributes = $parsed->attributes;
         $member->dataType = $declaration->dataType;
         $member->returnType = $declaration->dataType;

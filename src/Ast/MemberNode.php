@@ -66,6 +66,26 @@ class MemberNode
     }
 
     /**
+     * Strips an optional visibility prefix ("+", "-", "#") from the start of
+     * a member declaration body and returns the visibility name (e.g. "public")
+     * plus the remaining body.
+     *
+     * Returns visibility=null when the body does not begin with a visibility sigil.
+     *
+     * @return array{visibility: ?string, body: string}
+     */
+    public static function parseVisibilityPrefix(string $line): array
+    {
+        if ($line === '' || !isset(self::VISIBILITY_MAP[$line[0]])) {
+            return ['visibility' => null, 'body' => $line];
+        }
+        return [
+            'visibility' => self::VISIBILITY_MAP[$line[0]],
+            'body' => substr($line, 1),
+        ];
+    }
+
+    /**
      * Detects a method-child directive marker (instantiation "^" or return type ":")
      * at the start of an indented line and returns the marker plus the trimmed body.
      *

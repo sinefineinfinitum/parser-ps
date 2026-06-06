@@ -2,7 +2,6 @@
 
 namespace Ponymator\Parser\Tests\Unit;
 
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ponymator\Parser\Parser;
 use Ponymator\Parser\SyntaxException;
@@ -23,7 +22,9 @@ class ParserTest extends TestCase {
         $this->assertEquals("class", $doc->entities[0]->type);
     }
 
-    #[DataProvider('entityDefinitionProvider')]
+    /**
+     * @dataProvider entityDefinitionProvider
+     */
     public function testParseEntityDefinitionReturnsDocumentWithEntity(string $content, string $expectedType, string $expectedName) {
         $parser = new Parser();
 

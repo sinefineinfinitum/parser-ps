@@ -2,7 +2,6 @@
 
 namespace Ponymator\Parser\Tests\Unit\Internal;
 
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ponymator\Parser\Internal\Line;
 
@@ -29,7 +28,9 @@ final class LineTest extends TestCase
         ];
     }
 
-    #[DataProvider('startsWithCases')]
+    /**
+     * @dataProvider startsWithCases
+     */
     public function testStartsWith(string $trimmed, string $prefix, bool $expected): void
     {
         $line = new Line(0, $trimmed, $trimmed, 0);

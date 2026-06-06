@@ -81,27 +81,30 @@ class Parser implements ParserInterface
         $trimmed = $line->trimmed;
 
         if (str_starts_with($trimmed, EntityNode::ENTITY_START)) {
-            $state->currentEntity = $this->parseEntityDirective($line);
-            $document->entities[] = $state->currentEntity;
-            $state->currentMethod = null;
+            $entity = $this->parseEntityDirective($line);
+            $document->entities[] = $entity;
+            $state->openEntity($entity);
             return;
         }
 
         if (EntityNode::isRelationMarker($trimmed[0])) {
-            $this->parseEntityRelationDirective($line, $state->currentEntity);
+            $this->parseEntityRelationDirective($line, $state->entity());
             return;
         }
 
-        if ($state->currentEntity === null) {
+        if ($state->entity() === null) {
             throw $this->syntaxError('Member declaration found without active entity', $line);
         }
 
-        $member = $this->parseMemberDirective($line, $state->currentEntity);
-        $state->currentEntity->members[] = $member;
+        $entity = $state->entity();
+        $member = $this->parseMemberDirective($line, $entity);
+        $entity->members[] = $member;
 
-        $state->currentMethod = ($member->type === 'method' || $member->type === 'function')
-            ? $member
-            : null;
+        if ($member->type === 'method' || $member->type === 'function') {
+            $state->openMethod($member);
+        } else {
+            $state->closeMethod();
+        }
     }
 
     /**
@@ -111,11 +114,11 @@ class Parser implements ParserInterface
      */
     private function parseIndentedLine(Line $line, ParserState $state): void
     {
-        if ($state->currentMethod === null) {
+        if ($state->method() === null) {
             throw $this->syntaxError('Indented line found without active method/function block', $line);
         }
 
-        $this->parseMethodChildDirective($line, $state->currentMethod);
+        $this->parseMethodChildDirective($line, $state->method());
     }
 
     /**
@@ -188,29 +191,24 @@ class Parser implements ParserInterface
             throw $this->syntaxError("Enum case '~' not allowed in @file context", $line);
         }
 
-        $symbol = $firstChar;
-        $visibility = null;
-        $rest = substr($trimmed, 1);
-
-        $hasVisibility = ($rest !== '' && MemberNode::hasVisibility($rest[0]));
-        if ($hasVisibility) {
-            if (!$currentEntity->canHaveVisibility()) {
-                throw $this->syntaxError('Visibility modifiers not allowed in @file context', $line);
-            }
-
-            $visibility = MemberNode::resolveVisibility($rest[0]);
-            $rest = substr($rest, 1);
+        $vis = MemberNode::parseVisibilityPrefix(substr($trimmed, 1));
+        if ($vis['visibility'] !== null && !$currentEntity->canHaveVisibility()) {
+            throw $this->syntaxError('Visibility modifiers not allowed in @file context', $line);
         }
 
-        $declaration = TokenParser::parseTypedDeclaration($rest);
+        $declaration = TokenParser::parseTypedDeclaration($vis['body']);
         $parsed = TokenParser::splitNameAndAttributes($declaration->nameAndKeywords);
 
         if ($parsed->name === '') {
             throw $this->syntaxError('Member name cannot be empty', $line);
         }
 
-        $member = new MemberNode($parsed->name, MemberNode::resolveType($symbol, $currentEntity), $currentEntity);
-        $member->visibility = $visibility;
+        $member = new MemberNode(
+            $parsed->name,
+            MemberNode::resolveType($firstChar, $currentEntity),
+            $currentEntity,
+        );
+        $member->visibility = $vis['visibility'];
         $member->attributes = $parsed->attributes;
         $member->dataType = $declaration->dataType;
         $member->returnType = $declaration->dataType;

@@ -94,3 +94,17 @@ tests/
 - Do not call `is_file` / `file_get_contents` outside `FileLoader`.
 - Do not add PSR-3 logger calls, deprecation stubs, or "future-proof" hooks
   unless explicitly requested.
+
+
+Before completing a code change, verify:
+
+- Exit codes match the documented contract.
+- Relevant PHPUnit tests were added or updated.
+- Existing tests still pass.
+- No PHP features newer than PHP 8.0 were introduced.
+
+After completing a code and test, verify:
+
+- Actuality of the documentation.
+> **Convention**: Feature folder names and branch names must match exactly, including the numbering. If a branch or folder with that number exists, take the next one.
+

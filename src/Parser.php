@@ -2,6 +2,7 @@
 
 namespace Ponymator\Parser;
 
+use Ponymator\Parser\Ast\CallNode;
 use Ponymator\Parser\Ast\Document;
 use Ponymator\Parser\Ast\EntityNode;
 use Ponymator\Parser\Ast\MemberNode;
@@ -12,6 +13,7 @@ use Ponymator\Parser\Internal\Lexer;
 use Ponymator\Parser\Internal\Line;
 use Ponymator\Parser\Internal\ParserState;
 use Ponymator\Parser\Internal\TokenParser;
+use RuntimeException;
 
 class Parser implements ParserInterface
 {
@@ -19,6 +21,7 @@ class Parser implements ParserInterface
 
     private Lexer $lexer;
     private FileLoader $loader;
+
 
     public function __construct(?Lexer $lexer = null, ?FileLoader $loader = null)
     {
@@ -44,7 +47,7 @@ class Parser implements ParserInterface
     }
 
     /**
-     * @throws \RuntimeException If the file cannot be read.
+     * @throws RuntimeException If the file cannot be read.
      * @throws SyntaxException If the file contents are not valid PSV1.
      */
     public function parseFile(string $path): Document
@@ -59,7 +62,7 @@ class Parser implements ParserInterface
     /**
      * @param  iterable<string> $paths
      * @return Document[]
-     * @throws \RuntimeException If any file cannot be read.
+     * @throws RuntimeException If any file cannot be read.
      * @throws SyntaxException If any file's contents are not valid PSV1.
      */
     public function parseFiles(iterable $paths): array
@@ -236,6 +239,11 @@ class Parser implements ParserInterface
             return;
         }
 
+        if (str_starts_with($trimmed, CallNode::MARKER_STRONG) || str_starts_with($trimmed, CallNode::MARKER_WEAK)) {
+            $this->parseCallDirective($line, $currentMethod);
+            return;
+        }
+
         $this->parseParameterDirective($line, $currentMethod);
     }
 
@@ -293,6 +301,15 @@ class Parser implements ParserInterface
         $paramNode->value = $declaration->value;
 
         $currentMethod->parameters[] = $paramNode;
+    }
+
+    private function parseCallDirective(Line $line, MemberNode $currentMethod): void
+    {
+        $callNode = CallNode::parseCall($line->trimmed);
+        if ($callNode === null) {
+            throw $this->syntaxError('Invalid call directive', $line);
+        }
+        $currentMethod->calls[] = $callNode;
     }
 
     private function syntaxError(string $message, Line $line): SyntaxException

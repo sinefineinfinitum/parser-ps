@@ -31,6 +31,10 @@ class MemberNode
      * @var string[] 
      */
     public array $creates = [];
+    /**
+     * @var CallNode[]
+     */
+    public array $calls = [];
 
     public function __construct(
         public string $name,

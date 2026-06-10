@@ -12,7 +12,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Ponymator\\Parser\\": "src/"
+            "Ponymator\\Parser\\": "src/",
+            "Ponymator\\Parser\\Tests\\": "tests/"
         }
     },
     "scripts": {

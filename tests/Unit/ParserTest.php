@@ -3,17 +3,21 @@
 namespace Ponymator\Parser\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
+use Ponymator\Parser\Ast\CallNode;
 use Ponymator\Parser\Parser;
 use Ponymator\Parser\SyntaxException;
 
-class ParserTest extends TestCase {
-    public function testParseEmptyContentReturnsEmptyDocument() {
+class ParserTest extends TestCase
+{
+    public function testParseEmptyContentReturnsEmptyDocument(): void
+    {
         $parser = new Parser();
         $doc = $parser->parse("");
         $this->assertEmpty($doc->entities);
     }
 
-    public function testParseClassDefinitionReturnsDocumentWithEntity() {
+    public function testParseClassDefinitionReturnsDocumentWithEntity(): void
+    {
         $parser = new Parser();
         $content = "@class TestClass";
         $doc = $parser->parse($content);
@@ -25,7 +29,8 @@ class ParserTest extends TestCase {
     /**
      * @dataProvider entityDefinitionProvider
      */
-    public function testParseEntityDefinitionReturnsDocumentWithEntity(string $content, string $expectedType, string $expectedName) {
+    public function testParseEntityDefinitionReturnsDocumentWithEntity(string $content, string $expectedType, string $expectedName): void
+    {
         $parser = new Parser();
 
         $doc = $parser->parse($content);
@@ -35,7 +40,8 @@ class ParserTest extends TestCase {
         $this->assertEquals($expectedType, $doc->entities[0]->type);
     }
 
-    public static function entityDefinitionProvider(): array {
+    public static function entityDefinitionProvider(): array
+    {
         return [
             'interface' => [
                 '@interface App\Contracts\SearchInterface',
@@ -60,12 +66,15 @@ class ParserTest extends TestCase {
         ];
     }
 
-    public function testParseClassExtendsParentClass() {
+    public function testParseClassExtendsParentClass(): void
+    {
         $parser = new Parser();
-        $content = implode("\n", [
+        $content = implode(
+            "\n", [
             '@class App\Service\SearchService',
             '>App\Core\BaseService',
-        ]);
+            ]
+        );
 
         $doc = $parser->parse($content);
 
@@ -74,44 +83,55 @@ class ParserTest extends TestCase {
         $this->assertEmpty($doc->entities[0]->implements);
     }
 
-    public function testParseClassImplementsInterfaces() {
+    public function testParseClassImplementsInterfaces(): void
+    {
         $parser = new Parser();
-        $content = implode("\n", [
+        $content = implode(
+            "\n", [
             '@class App\Service\SearchService',
             '<App\Contracts\SearchInterface',
             '<App\Contracts\LoggerAwareInterface',
-        ]);
+            ]
+        );
 
         $doc = $parser->parse($content);
 
         $this->assertCount(1, $doc->entities);
         $this->assertEmpty($doc->entities[0]->extends);
-        $this->assertEquals([
+        $this->assertEquals(
+            [
             'App\Contracts\SearchInterface',
             'App\Contracts\LoggerAwareInterface',
-        ], $doc->entities[0]->implements);
+            ], $doc->entities[0]->implements
+        );
     }
 
-    public function testParseClassExtendsAndImplements() {
+    public function testParseClassExtendsAndImplements(): void
+    {
         $parser = new Parser();
-        $content = implode("\n", [
+        $content = implode(
+            "\n", [
             '@class App\Service\SearchService',
             '>App\Core\BaseService',
             '<App\Contracts\SearchInterface',
             '<App\Contracts\LoggerAwareInterface',
-        ]);
+            ]
+        );
 
         $doc = $parser->parse($content);
 
         $this->assertCount(1, $doc->entities);
         $this->assertEquals(['App\Core\BaseService'], $doc->entities[0]->extends);
-        $this->assertEquals([
+        $this->assertEquals(
+            [
             'App\Contracts\SearchInterface',
             'App\Contracts\LoggerAwareInterface',
-        ], $doc->entities[0]->implements);
+            ], $doc->entities[0]->implements
+        );
     }
 
-    public function testParseMultipleRootDocumentationFiles() {
+    public function testParseMultipleRootDocumentationFiles(): void
+    {
         $parser = new Parser();
         $files = glob(__DIR__ . '/../docs/*.psv1');
 
@@ -130,7 +150,8 @@ class ParserTest extends TestCase {
         $this->assertGreaterThanOrEqual(2, count($parsedDocuments));
     }
 
-    public function testParseMultipleDocumentationFilesFromNestedFolder() {
+    public function testParseMultipleDocumentationFilesFromNestedFolder(): void
+    {
         $parser = new Parser();
         $files = glob(__DIR__ . '/../docs/Analyzer/*.psv1');
 
@@ -147,12 +168,15 @@ class ParserTest extends TestCase {
         }
 
         $this->assertContains('SineFine\Ponymator\Analyzer\Parser', $entityNames);
+        $this->assertContains('SineFine\Ponymator\Analyzer\CallAssociationResolver', $entityNames);
         $this->assertGreaterThanOrEqual(2, count($entityNames));
     }
 
-    public function testParseComplexClassWithAllFeatures() {
+    public function testParseComplexClassWithAllFeatures(): void
+    {
         $parser = new Parser();
-        $content = implode("\n", [
+        $content = implode(
+            "\n", [
             '@class final App\Service\SearchService',
             '>App\Core\BaseService',
             '<App\Contracts\SearchInterface',
@@ -172,7 +196,8 @@ class ParserTest extends TestCase {
             '    &$source:array',
             '    $limit:int=10',
             '    :array',
-        ]);
+            ]
+        );
 
         $doc = $parser->parse($content);
 
@@ -247,14 +272,17 @@ class ParserTest extends TestCase {
         $this->assertEquals('10', $param2_2->value);
     }
 
-    public function testParseEnumWithCases() {
+    public function testParseEnumWithCases()
+    {
         $parser = new Parser();
-        $content = implode("\n", [
+        $content = implode(
+            "\n", [
             '@enum App\Status',
             '~Active=1',
             '~Inactive:int=2',
             '~Pending',
-        ]);
+            ]
+        );
 
         $doc = $parser->parse($content);
         $this->assertCount(1, $doc->entities);
@@ -280,9 +308,11 @@ class ParserTest extends TestCase {
         $this->assertNull($case3->value);
     }
 
-    public function testParseProceduralFile() {
+    public function testParseProceduralFile()
+    {
         $parser = new Parser();
-        $content = implode("\n", [
+        $content = implode(
+            "\n", [
             '@file src/functions.php',
             '',
             '.getUser',
@@ -292,7 +322,8 @@ class ParserTest extends TestCase {
             '!MAX_RETRIES:int=3',
             '',
             '$debugMode:bool=false',
-        ]);
+            ]
+        );
 
         $doc = $parser->parse($content);
         $this->assertCount(1, $doc->entities);
@@ -324,38 +355,44 @@ class ParserTest extends TestCase {
         $this->assertEquals('false', $globalVar->value);
     }
 
-    public function testSyntaxExceptionOnInvalidIndentation() {
+    public function testSyntaxExceptionOnInvalidIndentation()
+    {
         $this->expectException(SyntaxException::class);
         $parser = new Parser();
         $parser->parse("@class Test\n  \$prop:int"); // 2 spaces is invalid
     }
 
-    public function testSyntaxExceptionOnTabsIndentation() {
+    public function testSyntaxExceptionOnTabsIndentation()
+    {
         $this->expectException(SyntaxException::class);
         $parser = new Parser();
         $parser->parse("@class Test\n\t\$prop:int");
     }
 
-    public function testSyntaxExceptionOnUnknownEntity() {
+    public function testSyntaxExceptionOnUnknownEntity()
+    {
         $this->expectException(SyntaxException::class);
         $parser = new Parser();
         $parser->parse("@unknown App\\SomeClass");
     }
 
-    public function testSyntaxExceptionOnVisibilityInFileContext() {
+    public function testSyntaxExceptionOnVisibilityInFileContext()
+    {
         $this->expectException(SyntaxException::class);
         $parser = new Parser();
         $parser->parse("@file src/functions.php\n!+MAX_RETRIES:int=3");
     }
 
-    public function testParseSetsParserVersionFromConstant() {
+    public function testParseSetsParserVersionFromConstant()
+    {
         $parser = new Parser();
         $doc = $parser->parse("@class Foo");
 
         $this->assertEquals(Parser::VERSION, $doc->parserVersion);
     }
 
-    public function testParseDoesNotSetSourcePathOrHash() {
+    public function testParseDoesNotSetSourcePathOrHash()
+    {
         $parser = new Parser();
         $doc = $parser->parse("@class Foo");
 
@@ -363,7 +400,8 @@ class ParserTest extends TestCase {
         $this->assertNull($doc->sourceHash);
     }
 
-    public function testParseFileReturnsDocumentWithSourceMetadata() {
+    public function testParseFileReturnsDocumentWithSourceMetadata()
+    {
         $parser = new Parser();
         $path = __DIR__ . '/../docs/Ponymator.psv1';
 
@@ -374,13 +412,15 @@ class ParserTest extends TestCase {
         $this->assertCount(1, $doc->entities);
     }
 
-    public function testParseFileThrowsOnMissingFile() {
+    public function testParseFileThrowsOnMissingFile()
+    {
         $this->expectException(\RuntimeException::class);
         $parser = new Parser();
         $parser->parseFile(__DIR__ . '/does-not-exist.psv1');
     }
 
-    public function testParseFilesReturnsArrayOfDocuments() {
+    public function testParseFilesReturnsArrayOfDocuments()
+    {
         $parser = new Parser();
         $paths = [
             __DIR__ . '/../docs/Ponymator.psv1',
@@ -392,5 +432,429 @@ class ParserTest extends TestCase {
         $this->assertCount(2, $docs);
         $this->assertEquals($paths[0], $docs[0]->sourcePath);
         $this->assertEquals($paths[1], $docs[1]->sourcePath);
+    }
+
+    public function testParseCallGraphStaticCall(): void
+    {
+        $parser = new Parser();
+        $content = implode(
+            "\n", [
+            '@class App\Service\SearchService',
+            '.+search',
+            '    *App\Repository\SearchRepository::find',
+            ]
+        );
+
+        $doc = $parser->parse($content);
+        $method = $doc->entities[0]->members[0];
+        $this->assertCount(1, $method->calls);
+        $this->assertSame('static', $method->calls[0]->type);
+        $this->assertSame('App\Repository\SearchRepository', $method->calls[0]->targetFQCN);
+        $this->assertSame('find', $method->calls[0]->targetMethod);
+        $this->assertSame('strong', $method->calls[0]->marker);
+    }
+
+    public function testParseCallGraphDynamicCall(): void
+    {
+        $parser = new Parser();
+        $content = implode(
+            "\n", [
+            '@class App\Service\SearchService',
+            '.+search',
+            '    ?App\Service\Handler->process',
+            ]
+        );
+
+        $doc = $parser->parse($content);
+        $method = $doc->entities[0]->members[0];
+        $this->assertCount(1, $method->calls);
+        $this->assertSame('dynamic', $method->calls[0]->type);
+        $this->assertSame('App\Service\Handler', $method->calls[0]->targetFQCN);
+        $this->assertSame('process', $method->calls[0]->targetMethod);
+        $this->assertSame('weak', $method->calls[0]->marker);
+    }
+
+    public function testParseCallGraphGlobalCall(): void
+    {
+        $parser = new Parser();
+        $content = implode(
+            "\n", [
+            '@class App\Service\SearchService',
+            '.+search',
+            '    *App\Util\formatDate',
+            ]
+        );
+
+        $doc = $parser->parse($content);
+        $method = $doc->entities[0]->members[0];
+        $this->assertCount(1, $method->calls);
+        $this->assertSame('global', $method->calls[0]->type);
+        $this->assertSame('', $method->calls[0]->targetFQCN);
+        $this->assertSame('App\Util\formatDate', $method->calls[0]->targetMethod);
+        $this->assertSame('strong', $method->calls[0]->marker);
+    }
+
+    public function testParseCallGraphGlobalCallWithoutNamespace(): void
+    {
+        $parser = new Parser();
+        $content = implode(
+            "\n", [
+            '@class App\Service\SearchService',
+            '.+search',
+            '    *global_call',
+            ]
+        );
+
+        $doc = $parser->parse($content);
+        $method = $doc->entities[0]->members[0];
+        $this->assertCount(1, $method->calls);
+        $this->assertSame('global', $method->calls[0]->type);
+        $this->assertSame('', $method->calls[0]->targetFQCN);
+        $this->assertSame('global_call', $method->calls[0]->targetMethod);
+        $this->assertSame('strong', $method->calls[0]->marker);
+    }
+
+    public function testParseCallGraphPreservesDuplicates(): void
+    {
+        $parser = new Parser();
+        $content = implode(
+            "\n", [
+            '@class App\Service\SearchService',
+            '.+search',
+            '    *App\Repository\SearchRepository::find',
+            '    *App\Repository\SearchRepository::find',
+            ]
+        );
+
+        $doc = $parser->parse($content);
+        $method = $doc->entities[0]->members[0];
+        $this->assertCount(2, $method->calls);
+    }
+
+    public function testParseCallGraphPreservesOrder(): void
+    {
+        $parser = new Parser();
+        $content = implode(
+            "\n", [
+            '@class App\Service\SearchService',
+            '.+search',
+            '    *App\Repository\SearchRepository::find',
+            '    ?App\Service\Handler->process',
+            '    *App\Util\formatDate',
+            ]
+        );
+
+        $doc = $parser->parse($content);
+        $method = $doc->entities[0]->members[0];
+        $this->assertCount(3, $method->calls);
+        $this->assertSame('static', $method->calls[0]->type);
+        $this->assertSame('dynamic', $method->calls[1]->type);
+        $this->assertSame('global', $method->calls[2]->type);
+    }
+
+    public function testParseCallGraphMixedWithParametersAndReturnType(): void
+    {
+        $parser = new Parser();
+        $content = implode(
+            "\n", [
+            '@class App\Service\SearchService',
+            '.+search',
+            '    $query:string',
+            '    :void',
+            '    *App\Repository\SearchRepository::find',
+            '    ^App\Search\Result',
+            ]
+        );
+
+        $doc = $parser->parse($content);
+        $method = $doc->entities[0]->members[0];
+        $this->assertCount(1, $method->parameters);
+        $this->assertSame('void', $method->returnType);
+        $this->assertCount(1, $method->calls);
+        $this->assertCount(1, $method->creates);
+    }
+
+
+    public function testParseCallGraphEmptyMethod(): void
+    {
+        $parser = new Parser();
+        $content = implode(
+            "\n", [
+            '@class App\Service\SearchService',
+            '.+search',
+            '    :void',
+            ]
+        );
+
+        $doc = $parser->parse($content);
+        $method = $doc->entities[0]->members[0];
+        $this->assertEmpty($method->calls);
+    }
+
+    public function testParsePonymatorFixtureRunMethodCalls(): void
+    {
+        $parser = new Parser();
+        $doc = $parser->parseFile(__DIR__ . '/../docs/Ponymator.psv1');
+
+        $entity = $doc->entities[0];
+        $this->assertSame('SineFine\Ponymator\Ponymator', $entity->name);
+
+        $runMethod = null;
+        foreach ($entity->members as $member) {
+            if ($member->name === 'run') {
+                $runMethod = $member;
+                break;
+            }
+        }
+        $this->assertNotNull($runMethod);
+        $this->assertCount(13, $runMethod->creates);
+        $this->assertNotEmpty($runMethod->calls);
+
+        $staticCalls = array_filter($runMethod->calls, fn(CallNode $c) => $c->type === 'static');
+        $dynamicCalls = array_filter($runMethod->calls, fn(CallNode $c) => $c->type === 'dynamic');
+        $this->assertNotEmpty($staticCalls);
+        $this->assertNotEmpty($dynamicCalls);
+
+        $argParseCall = null;
+        foreach ($runMethod->calls as $call) {
+            if ($call->targetFQCN === 'SineFine\Ponymator\Cli\ArgumentParser' && $call->targetMethod === 'parse') {
+                $argParseCall = $call;
+                break;
+            }
+        }
+        $this->assertNotNull($argParseCall);
+        $this->assertSame('static', $argParseCall->type);
+        $this->assertSame('strong', $argParseCall->marker);
+    }
+
+    public function testParseConfigFixtureHasNoCalls(): void
+    {
+        $parser = new Parser();
+        $doc = $parser->parseFile(__DIR__ . '/../docs/Config.psv1');
+
+        $entity = $doc->entities[0];
+        $this->assertSame('SineFine\Ponymator\Config', $entity->name);
+
+        foreach ($entity->members as $member) {
+            if ($member->type === 'method') {
+                $this->assertEmpty($member->calls);
+            }
+        }
+    }
+
+    public function testParseCallAssociationResolverEnterNodeCalls(): void
+    {
+        $parser = new Parser();
+        $doc = $parser->parseFile(__DIR__ . '/../docs/Analyzer/CallAssociationResolver.psv1');
+
+        $entity = $doc->entities[0];
+        $enterNode = null;
+        foreach ($entity->members as $member) {
+            if ($member->name === 'enterNode') {
+                $enterNode = $member;
+                break;
+            }
+        }
+        $this->assertNotNull($enterNode);
+        $this->assertCount(10, $enterNode->calls);
+
+        foreach ($enterNode->calls as $call) {
+            $this->assertSame('dynamic', $call->type);
+            $this->assertSame('strong', $call->marker);
+        }
+    }
+
+    public function testParseDependencyCollectingVisitorHasWeakCall(): void
+    {
+        $parser = new Parser();
+        $doc = $parser->parseFile(__DIR__ . '/../docs/Analyzer/Visitor/DependencyCollectingVisitor.psv1');
+
+        $entity = $doc->entities[0];
+        $enterNode = null;
+        foreach ($entity->members as $member) {
+            if ($member->name === 'enterNode') {
+                $enterNode = $member;
+                break;
+            }
+        }
+        $this->assertNotNull($enterNode);
+
+        $weakCalls = array_filter($enterNode->calls, fn(CallNode $c) => $c->marker === 'weak');
+        $this->assertNotEmpty($weakCalls);
+
+        $weakCall = array_values($weakCalls)[0];
+        $this->assertSame('dynamic', $weakCall->type);
+        $this->assertSame('PhpParser\Node', $weakCall->targetFQCN);
+        $this->assertSame('toCodeString', $weakCall->targetMethod);
+    }
+
+    public function testParseAstHelperFixtureRecursiveCalls(): void
+    {
+        $parser = new Parser();
+        $doc = $parser->parseFile(__DIR__ . '/../docs/Analyzer/Extractor/AstHelper.psv1');
+
+        $entity = $doc->entities[0];
+        $this->assertSame('SineFine\Ponymator\Analyzer\Extractor\AstHelper', $entity->name);
+
+        $resolveType = null;
+        foreach ($entity->members as $member) {
+            if ($member->name === 'resolveType') {
+                $resolveType = $member;
+                break;
+            }
+        }
+        $this->assertNotNull($resolveType);
+
+        $selfCalls = array_filter(
+            $resolveType->calls,
+            fn(CallNode $c) => $c->targetFQCN === 'SineFine\Ponymator\Analyzer\Extractor\AstHelper'
+        );
+        $this->assertNotEmpty($selfCalls);
+    }
+
+    public function testParseAllFixturesCallGraphIntegrity(): void
+    {
+        $parser = new Parser();
+        $rootFiles = glob(__DIR__ . '/../docs/*.psv1') ?: [];
+        $analyzerTopFiles = glob(__DIR__ . '/../docs/Analyzer/*.psv1') ?: [];
+        $analyzerNestedFiles = glob(__DIR__ . '/../docs/Analyzer/**/*.psv1') ?: [];
+        $allFiles = array_merge($rootFiles, $analyzerTopFiles, $analyzerNestedFiles);
+
+        $this->assertNotEmpty($allFiles);
+
+        foreach ($allFiles as $file) {
+            $doc = $parser->parseFile($file);
+            foreach ($doc->entities as $entity) {
+                foreach ($entity->members as $member) {
+                    if ($member->type !== 'method' && $member->type !== 'function') {
+                        continue;
+                    }
+                    foreach ($member->calls as $call) {
+                        $this->assertContains($call->type, ['static', 'dynamic', 'global']);
+                        $this->assertContains($call->marker, ['strong', 'weak']);
+                        $this->assertNotEmpty($call->targetMethod);
+                    }
+                }
+            }
+        }
+    }
+
+    public function testParseCallGraphDynamicCallMultipleCandidates(): void
+    {
+        $parser = new Parser();
+        $content = implode(
+            "\n", [
+            '@class App\Service\SearchService',
+            '.+parse',
+            '    ?App\Service\Handler1->process',
+            '    ?App\Service\Handler2->process',
+            ]
+        );
+
+        $doc = $parser->parse($content);
+        $method = $doc->entities[0]->members[0];
+        $this->assertCount(2, $method->calls);
+        $this->assertSame('App\Service\Handler1', $method->calls[0]->targetFQCN);
+        $this->assertSame('App\Service\Handler2', $method->calls[1]->targetFQCN);
+        $this->assertSame('weak', $method->calls[0]->marker);
+        $this->assertSame('weak', $method->calls[1]->marker);
+    }
+
+    public function testParseCallGraphInFileContext(): void
+    {
+        $parser = new Parser();
+        $content = implode(
+            "\n", [
+            '@file src/helpers.php',
+            '.processData',
+            '    $data:array',
+            '    :array',
+            '    *App\Util\formatDate',
+            '    *App\Service\Logger->log',
+            ]
+        );
+
+        $doc = $parser->parse($content);
+        $entity = $doc->entities[0];
+        $this->assertSame('file', $entity->type);
+        $func = $entity->members[0];
+        $this->assertSame('function', $func->type);
+        $this->assertNull($func->visibility);
+        $this->assertCount(2, $func->calls);
+        $this->assertSame('global', $func->calls[0]->type);
+        $this->assertSame('dynamic', $func->calls[1]->type);
+    }
+
+    public function testParseFileFunctionPreservesAllCalls(): void
+    {
+        $parser = new Parser();
+        $content = implode("\n", [
+            '@file src/helpers.php',
+            '.processData',
+            '    $data:array',
+            '    :array',
+            '    *strlen',
+            '    *array_map',
+            '    *App\Service\Logger->log',
+        ]);
+
+        $doc = $parser->parse($content);
+        $func = $doc->entities[0]->members[0];
+        $this->assertSame('function', $func->type);
+        $this->assertCount(3, $func->calls);
+        $this->assertSame('global', $func->calls[0]->type);
+        $this->assertSame('strlen', $func->calls[0]->targetMethod);
+        $this->assertSame('global', $func->calls[1]->type);
+        $this->assertSame('array_map', $func->calls[1]->targetMethod);
+        $this->assertSame('dynamic', $func->calls[2]->type);
+    }
+
+    public function testParseFileMultipleFunctionsWithCalls(): void
+    {
+        $parser = new Parser();
+        $content = implode("\n", [
+            '@file src/helpers.php',
+            '.formatName',
+            '    $name:string',
+            '    :string',
+            '    *App\Util\StringUtils::normalize',
+            '.validateEmail',
+            '    $email:string',
+            '    :bool',
+            '    *App\Service\Validator->check',
+        ]);
+
+        $doc = $parser->parse($content);
+        $this->assertCount(2, $doc->entities[0]->members);
+
+        $func1 = $doc->entities[0]->members[0];
+        $this->assertSame('formatName', $func1->name);
+        $this->assertSame('function', $func1->type);
+        $this->assertCount(1, $func1->calls);
+        $this->assertSame('static', $func1->calls[0]->type);
+
+        $func2 = $doc->entities[0]->members[1];
+        $this->assertSame('validateEmail', $func2->name);
+        $this->assertSame('function', $func2->type);
+        $this->assertCount(1, $func2->calls);
+        $this->assertSame('dynamic', $func2->calls[0]->type);
+    }
+
+    public function testParseFileFunctionWithDuplicateCalls(): void
+    {
+        $parser = new Parser();
+        $content = implode("\n", [
+            '@file src/helpers.php',
+            '.processData',
+            '    $data:array',
+            '    :array',
+            '    *App\Service\Logger->log',
+            '    *App\Service\Logger->log',
+            '    *App\Service\Cache->get',
+        ]);
+
+        $doc = $parser->parse($content);
+        $func = $doc->entities[0]->members[0];
+        $this->assertCount(3, $func->calls);
     }
 }

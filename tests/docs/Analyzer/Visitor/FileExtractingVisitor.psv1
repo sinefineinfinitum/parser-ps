@@ -1,8 +1,0 @@
-@class SineFine\Ponymator\Analyzer\Visitor\FileExtractingVisitor
->PhpParser\NodeVisitorAbstract
-$-globals:array=[]
-.+enterNode
-    $node:\PhpParser\Node
-    :int|null
-.+globals
-    :array

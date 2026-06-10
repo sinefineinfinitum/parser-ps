@@ -8,3 +8,5 @@ $-parser:\PhpParser\Parser
     ^SineFine\Ponymator\Analyzer\ParserException
     ^PhpParser\NodeTraverser
     ^PhpParser\NodeVisitor\NameResolver
+    *PhpParser\NodeTraverser->addVisitor
+    *PhpParser\NodeTraverser->traverse

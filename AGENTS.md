@@ -1,7 +1,7 @@
 # Agent Guidelines
 
 Working on the `ponymator/parser` library — a PHP 8.0+ parser for Ponymator
-Syntax v1.0 (PSV1). Read [spec-ps-v1.md](spec-ps-v1.md) before changing parser
+Syntax v1.1 (PSV1). Read [spec-ps-v1.md](spec-ps-v1.md) before changing parser
 semantics.
 
 ## Commands
@@ -27,6 +27,8 @@ src/
     MemberNode.php              # SYMBOLS, VISIBILITY_MAP, INSTANTIATION_MARKER,
                                 #   RETURN_TYPE_MARKER, parseChildDirective
     ParameterNode.php           # BY_REF_MARKER, VARIABLE_PREFIX, parsePrefix
+    CallNode.php                # MARKER_STRONG, MARKER_WEAK, TYPE_STATIC,
+                                #   TYPE_DYNAMIC, TYPE_GLOBAL, parseCall, resolveCall
   Internal/                     # @internal, do not reference from outside src/
     Lexer.php                   # tokenize(): string -> Line[]; INDENT_WIDTH=4
     Line.php                    # (number, raw, trimmed, indentation)
@@ -39,13 +41,14 @@ src/
       FilesystemException.php
   Contracts/
     ParserInterface.php
-
 tests/
-  Unit/                         # PHPUnit 10
+  Unit/                         # PHPUnit 9
+    Ast/                        # CallNodeTest
     Internal/                   # LexerTest, FileLoaderTest, TokenParserTest, …
     ParserTest.php
   Integration/
     ApiTraversalTest.php
+    CallGraphPerformanceTest.php
   docs/                         # *.psv1 fixture files
 ```
 
@@ -57,7 +60,8 @@ tests/
 - **`declare(strict_types=1)`** on every PHP file.
 - **Grammar lives on nodes**: marker constants and `parse*` helpers are static
   methods on the AST node that owns them (`EntityNode::TYPES`,
-  `MemberNode::parseChildDirective`, `ParameterNode::parsePrefix`).
+  `MemberNode::parseChildDirective`, `ParameterNode::parsePrefix`,
+  `CallNode::parseCall`, `CallNode::resolveCall`).
 - **Lexer owns line-level concerns**: rtrim, trim, indentation validation,
   blank-line skipping. Parser must not construct `Line` instances directly.
 - **FileLoader owns I/O**: Parser does not call `is_file` / `file_get_contents`.

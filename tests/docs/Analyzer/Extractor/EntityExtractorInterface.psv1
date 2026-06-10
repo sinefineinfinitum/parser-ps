@@ -1,7 +1,0 @@
-@interface SineFine\Ponymator\Analyzer\Extractor\EntityExtractorInterface
-.+extract
-    $node:\PhpParser\Node
-    :array
-.+supports
-    $node:\PhpParser\Node
-    :bool

@@ -177,22 +177,22 @@ class ParserTest extends TestCase
         $parser = new Parser();
         $content = implode(
             "\n", [
-            '@class final App\Service\SearchService',
+            '@class App\Service\SearchService final',
             '>App\Core\BaseService',
             '<App\Contracts\SearchInterface',
             '%App\LoggableTrait',
             '',
-            '$-readonly vectorStore:App\Storage\VectorStore',
+            '$-vectorStore readonly:App\Storage\VectorStore',
             '$-mixedResult:int|string|null',
             '',
             '!+DEFAULT_LIMIT:int=25',
             '',
-            '.+final search',
+            '.+search final',
             '    $query:App\Query\SearchQuery',
             '    :App\Search\SearchResult|null',
             '    ^App\Search\SearchResult',
             '',
-            '.+static merge',
+            '.+merge static',
             '    &$source:array',
             '    $limit:int=10',
             '    :array',
@@ -212,7 +212,7 @@ class ParserTest extends TestCase
 
         $this->assertCount(5, $entity->members);
 
-        // 1. $-readonly vectorStore:App\Storage\VectorStore
+        // 1. $-vectorStore readonly:App\Storage\VectorStore
         $prop1 = $entity->members[0];
         $this->assertEquals('vectorStore', $prop1->name);
         $this->assertEquals('property', $prop1->type);
@@ -236,7 +236,7 @@ class ParserTest extends TestCase
         $this->assertEquals('int', $const1->dataType);
         $this->assertEquals('25', $const1->value);
 
-        // 4. .+final search
+        // 4. .+search final
         $method1 = $entity->members[3];
         $this->assertEquals('search', $method1->name);
         $this->assertEquals('method', $method1->type);
@@ -252,7 +252,7 @@ class ParserTest extends TestCase
         $this->assertFalse($param1->byRef);
         $this->assertNull($param1->value);
 
-        // 5. .+static merge
+        // 5. .+merge static
         $method2 = $entity->members[4];
         $this->assertEquals('merge', $method2->name);
         $this->assertEquals('method', $method2->type);
@@ -845,11 +845,11 @@ class ParserTest extends TestCase
         $parser = new Parser();
         $content = implode("\n", [
             '@class App\Config',
-            '$-static final:array=[]',
-            '$-static finalMethods:array=[]',
-            '$-static deprecated:array=[]',
-            '$-static internal:array=[]',
-            '$-readonly caseCheck:int',
+            '$-final static:array=[]',
+            '$-finalMethods static:array=[]',
+            '$-deprecated static:array=[]',
+            '$-internal static:array=[]',
+            '$-caseCheck readonly:int',
         ]);
 
         $doc = $parser->parse($content);

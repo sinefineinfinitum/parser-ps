@@ -81,10 +81,10 @@ final class TokenParser
     /**
      * Splits a string into a name and an array of attributes (keywords).
      *
-     * The last whitespace-delimited element is always the name. All preceding
+     * The first whitespace-delimited element is always the name. All following
      * elements must be recognised keywords (see KEYWORDS).
      *
-     * @throws SyntaxException When the input is empty or an attribute is not a known keyword.
+     * @throws SyntaxException When the input is empty or a non-name token is not a known keyword.
      */
     public static function splitNameAndAttributes(string $inputString): NameAndAttributes
     {
@@ -100,7 +100,7 @@ final class TokenParser
             throw new SyntaxException('Name cannot be empty');
         }
 
-        $name = array_pop($words);
+        $name = array_shift($words);
         $attributes = [];
 
         foreach ($words as $word) {

@@ -1,4 +1,4 @@
-@class final SineFine\Ponymator\Analyzer\CallAssociationResolver
+@class SineFine\Ponymator\Analyzer\CallAssociationResolver final
 >PhpParser\NodeVisitorAbstract
 !-BUILTIN_TYPES=[]
 $-calls:array=[]

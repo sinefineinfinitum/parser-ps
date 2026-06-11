@@ -11,14 +11,14 @@ class ApiTraversalTest extends TestCase
     {
         $parser = new Parser();
         $psv1Content = <<<PSV1
-@class final App\Service\SearchService
+@class App\Service\SearchService final
 >App\Core\BaseService
 <App\Contracts\SearchInterface
 %App\LoggableTrait
 
-$-readonly vectorStore:App\Storage\VectorStore
+$-vectorStore readonly:App\Storage\VectorStore
 
-.+final search
+.+search final
     \$query:App\Query\SearchQuery
     :App\Search\SearchResult|null
     ^App\Search\SearchResult

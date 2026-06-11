@@ -1,4 +1,4 @@
-@class final SineFine\Ponymator\Analyzer\Extractor\AstHelper
+@class SineFine\Ponymator\Analyzer\Extractor\AstHelper final
 .+resolveFqn
     $namespace:string
     $name:string

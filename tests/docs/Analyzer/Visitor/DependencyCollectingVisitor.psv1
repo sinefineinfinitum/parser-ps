@@ -1,4 +1,4 @@
-@class final SineFine\Ponymator\Analyzer\Visitor\DependencyCollectingVisitor
+@class SineFine\Ponymator\Analyzer\Visitor\DependencyCollectingVisitor final
 >PhpParser\NodeVisitorAbstract
 !-BUILTIN_TYPES=[]
 $-deps:array=[]

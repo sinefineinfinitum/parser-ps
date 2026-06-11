@@ -16,15 +16,15 @@ final class NameAndAttributesTest extends TestCase
     {
         return [
             'plain name' => ['foo', 'foo', []],
-            'final keyword before name' => ['final foo', 'foo', ['final']],
-            'static keyword before name' => ['static foo', 'foo', ['static']],
-            'abstract keyword before name' => ['abstract foo', 'foo', ['abstract']],
-            'readonly keyword before name' => ['readonly foo', 'foo', ['readonly']],
-            'multiple keywords before name' => ['final static foo', 'foo', ['final', 'static']],
-            'all four keywords before name' => ['final abstract static readonly foo', 'foo', ['final', 'abstract', 'static', 'readonly']],
+            'name with one keyword after' => ['foo final', 'foo', ['final']],
+            'name with static after' => ['foo static', 'foo', ['static']],
+            'name with abstract after' => ['foo abstract', 'foo', ['abstract']],
+            'name with readonly after' => ['foo readonly', 'foo', ['readonly']],
+            'name with multiple keywords after' => ['foo final static', 'foo', ['final', 'static']],
+            'name with all four keywords after' => ['foo final abstract static readonly', 'foo', ['final', 'abstract', 'static', 'readonly']],
             'single keyword as name' => ['final', 'final', []],
-            'all keywords last is name' => ['static final', 'final', ['static']],
-            'all four keywords last is name' => ['final abstract static readonly', 'readonly', ['final', 'abstract', 'static']],
+            'keywords that look like names' => ['static final', 'static', ['final']],
+            'all four keywords as name and attrs' => ['final abstract static readonly', 'final', ['abstract', 'static', 'readonly']],
         ];
     }
 
@@ -61,24 +61,17 @@ final class NameAndAttributesTest extends TestCase
         TokenParser::splitNameAndAttributes('   ');
     }
 
-    public function testUnknownAttributeThrowsException(): void
+    public function testNonKeywordAfterNameThrowsException(): void
     {
         $this->expectException(SyntaxException::class);
         $this->expectExceptionMessage('Unknown attribute "volatile"');
-        TokenParser::splitNameAndAttributes('volatile foo');
+        TokenParser::splitNameAndAttributes('foo volatile');
     }
 
-    public function testMultipleSpacesWithFirstWordAsUnknownAttributeThrows(): void
+    public function testUnknownBeforeKnownKeywordThrows(): void
     {
         $this->expectException(SyntaxException::class);
-        $this->expectExceptionMessage('Unknown attribute "something"');
-        TokenParser::splitNameAndAttributes('something    foo');
-    }
-
-    public function testKeywordInMiddleWithUnknownBeforeThrows(): void
-    {
-        $this->expectException(SyntaxException::class);
-        $this->expectExceptionMessage('Unknown attribute "foo"');
-        TokenParser::splitNameAndAttributes('foo final bar');
+        $this->expectExceptionMessage('Unknown attribute "unknown"');
+        TokenParser::splitNameAndAttributes('foo unknown final');
     }
 }

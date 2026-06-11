@@ -187,12 +187,12 @@ class ParserTest extends TestCase
             '',
             '!+DEFAULT_LIMIT:int=25',
             '',
-            '.+search final',
+            '.+final search',
             '    $query:App\Query\SearchQuery',
             '    :App\Search\SearchResult|null',
             '    ^App\Search\SearchResult',
             '',
-            '.+merge static',
+            '.+static merge',
             '    &$source:array',
             '    $limit:int=10',
             '    :array',
@@ -236,7 +236,7 @@ class ParserTest extends TestCase
         $this->assertEquals('int', $const1->dataType);
         $this->assertEquals('25', $const1->value);
 
-        // 4. .+search final
+        // 4. .+final search
         $method1 = $entity->members[3];
         $this->assertEquals('search', $method1->name);
         $this->assertEquals('method', $method1->type);
@@ -252,7 +252,7 @@ class ParserTest extends TestCase
         $this->assertFalse($param1->byRef);
         $this->assertNull($param1->value);
 
-        // 5. .+merge static
+        // 5. .+static merge
         $method2 = $entity->members[4];
         $this->assertEquals('merge', $method2->name);
         $this->assertEquals('method', $method2->type);
@@ -838,6 +838,48 @@ class ParserTest extends TestCase
         $this->assertSame('function', $func2->type);
         $this->assertCount(1, $func2->calls);
         $this->assertSame('dynamic', $func2->calls[0]->type);
+    }
+
+    public function testParseStaticPropertyWithKeywordLikeName(): void
+    {
+        $parser = new Parser();
+        $content = implode("\n", [
+            '@class App\Config',
+            '$-static final:array=[]',
+            '$-static finalMethods:array=[]',
+            '$-static deprecated:array=[]',
+            '$-static internal:array=[]',
+            '$-readonly caseCheck:int',
+        ]);
+
+        $doc = $parser->parse($content);
+        $entity = $doc->entities[0];
+
+        $prop1 = $entity->members[0];
+        $this->assertSame('final', $prop1->name);
+        $this->assertSame('property', $prop1->type);
+        $this->assertSame('private', $prop1->visibility);
+        $this->assertSame(['static'], $prop1->attributes);
+        $this->assertSame('array', $prop1->dataType);
+        $this->assertSame('[]', $prop1->value);
+
+        $prop2 = $entity->members[1];
+        $this->assertSame('finalMethods', $prop2->name);
+        $this->assertSame(['static'], $prop2->attributes);
+
+        $prop3 = $entity->members[2];
+        $this->assertSame('deprecated', $prop3->name);
+        $this->assertSame(['static'], $prop3->attributes);
+
+        $prop4 = $entity->members[3];
+        $this->assertSame('internal', $prop4->name);
+        $this->assertSame(['static'], $prop4->attributes);
+
+        $prop5 = $entity->members[4];
+        $this->assertSame('caseCheck', $prop5->name);
+        $this->assertSame('private', $prop5->visibility);
+        $this->assertSame(['readonly'], $prop5->attributes);
+        $this->assertSame('int', $prop5->dataType);
     }
 
     public function testParseFileFunctionWithDuplicateCalls(): void

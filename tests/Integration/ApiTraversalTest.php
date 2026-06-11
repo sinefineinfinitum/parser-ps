@@ -18,7 +18,7 @@ class ApiTraversalTest extends TestCase
 
 $-readonly vectorStore:App\Storage\VectorStore
 
-.+search final
+.+final search
     \$query:App\Query\SearchQuery
     :App\Search\SearchResult|null
     ^App\Search\SearchResult

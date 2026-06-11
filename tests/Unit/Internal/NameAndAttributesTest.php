@@ -5,6 +5,7 @@ namespace Ponymator\Parser\Tests\Unit\Internal;
 use PHPUnit\Framework\TestCase;
 use Ponymator\Parser\Internal\NameAndAttributes;
 use Ponymator\Parser\Internal\TokenParser;
+use Ponymator\Parser\SyntaxException;
 
 final class NameAndAttributesTest extends TestCase
 {
@@ -15,14 +16,15 @@ final class NameAndAttributesTest extends TestCase
     {
         return [
             'plain name' => ['foo', 'foo', []],
-            'final keyword' => ['final foo', 'foo', ['final']],
-            'static keyword' => ['static foo', 'foo', ['static']],
-            'abstract keyword' => ['abstract foo', 'foo', ['abstract']],
-            'readonly keyword' => ['readonly foo', 'foo', ['readonly']],
-            'multiple keywords' => ['final static foo', 'foo', ['final', 'static']],
-            'all four keywords' => ['final abstract static readonly foo', 'foo', ['final', 'abstract', 'static', 'readonly']],
-            'non-keyword suffix treated as name' => ['something foo', 'something foo', []],
-            'keyword anywhere is extracted' => ['foo final bar', 'foo bar', ['final']],
+            'final keyword before name' => ['final foo', 'foo', ['final']],
+            'static keyword before name' => ['static foo', 'foo', ['static']],
+            'abstract keyword before name' => ['abstract foo', 'foo', ['abstract']],
+            'readonly keyword before name' => ['readonly foo', 'foo', ['readonly']],
+            'multiple keywords before name' => ['final static foo', 'foo', ['final', 'static']],
+            'all four keywords before name' => ['final abstract static readonly foo', 'foo', ['final', 'abstract', 'static', 'readonly']],
+            'single keyword as name' => ['final', 'final', []],
+            'all keywords last is name' => ['static final', 'final', ['static']],
+            'all four keywords last is name' => ['final abstract static readonly', 'readonly', ['final', 'abstract', 'static']],
         ];
     }
 
@@ -45,27 +47,38 @@ final class NameAndAttributesTest extends TestCase
         );
     }
 
-    public function testEmptyStringYieldsEmptyNameAndNoAttributes(): void
+    public function testEmptyStringThrowsException(): void
     {
-        $result = TokenParser::splitNameAndAttributes('');
-
-        $this->assertSame('', $result->name);
-        $this->assertSame([], $result->attributes);
+        $this->expectException(SyntaxException::class);
+        $this->expectExceptionMessage('Name cannot be empty');
+        TokenParser::splitNameAndAttributes('');
     }
 
-    public function testCollapsesMultipleSpaces(): void
+    public function testWhitespaceStringThrowsException(): void
     {
-        $result = TokenParser::splitNameAndAttributes('foo    bar');
-
-        $this->assertSame('foo bar', $result->name);
-        $this->assertSame([], $result->attributes);
+        $this->expectException(SyntaxException::class);
+        $this->expectExceptionMessage('Name cannot be empty');
+        TokenParser::splitNameAndAttributes('   ');
     }
 
-    public function testIgnoresUnknownKeywords(): void
+    public function testUnknownAttributeThrowsException(): void
     {
-        $result = TokenParser::splitNameAndAttributes('volatile foo');
+        $this->expectException(SyntaxException::class);
+        $this->expectExceptionMessage('Unknown attribute "volatile"');
+        TokenParser::splitNameAndAttributes('volatile foo');
+    }
 
-        $this->assertSame('volatile foo', $result->name);
-        $this->assertSame([], $result->attributes);
+    public function testMultipleSpacesWithFirstWordAsUnknownAttributeThrows(): void
+    {
+        $this->expectException(SyntaxException::class);
+        $this->expectExceptionMessage('Unknown attribute "something"');
+        TokenParser::splitNameAndAttributes('something    foo');
+    }
+
+    public function testKeywordInMiddleWithUnknownBeforeThrows(): void
+    {
+        $this->expectException(SyntaxException::class);
+        $this->expectExceptionMessage('Unknown attribute "foo"');
+        TokenParser::splitNameAndAttributes('foo final bar');
     }
 }
